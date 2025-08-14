@@ -1,0 +1,29 @@
+import axios from "axios";
+
+export const TMDB_CONFIG = {
+  BASE_URL: "https://api.themoviedb.org/3",
+  API_KEY: process.env.EXPO_PUBLIC_MOVIE_API_KEY,
+  headers: {
+    accept: "application/json",
+    Authorization: `Bearer ${process.env.EXPO_PUBLIC_MOVIE_API_KEY}`,
+  },
+};
+
+export const fetchMovies = async ({ query }: { query: string }) => {
+  try {
+    const endpoint = query
+      ? `${TMDB_CONFIG.BASE_URL}/search/movie?query=${encodeURIComponent(
+          query
+        )}`
+      : `${TMDB_CONFIG.BASE_URL}/discover/movie?sort_by=popularity.desc`;
+
+    const response = await axios.get(endpoint, {
+      headers: TMDB_CONFIG.headers,
+    });
+
+    return response.data.results;
+  } catch (error) {
+    console.error("Error fetching movies:", error);
+    throw new Error("Failed to fetch movies");
+  }
+};
