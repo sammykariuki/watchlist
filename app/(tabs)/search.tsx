@@ -3,6 +3,7 @@ import SearchBar from "@/components/SearchBar";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { fetchMovies } from "@/services/api";
+import { updateSearchCount } from "@/services/appwrite";
 import useFetch from "@/services/useFetch";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Image, Text, View } from "react-native";
@@ -28,6 +29,12 @@ export default function Search() {
     return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
+  useEffect(() => {
+    if (movies?.length > 0 && movies?.[0]) {
+      updateSearchCount(searchQuery, movies[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [movies]);
   return (
     <View className="flex-1 bg-primary">
       <Image source={images.bg} className="flex-1 absolute w-full z-0" />
@@ -47,7 +54,7 @@ export default function Search() {
           paddingBottom: 100,
         }}
         ListHeaderComponent={
-          <>
+          <View>
             <View className="w-full flex-row justify-center mt-20 items-center">
               <Image source={icons.logo} className="w-12 h-10" />
             </View>
@@ -76,8 +83,9 @@ export default function Search() {
                 <Text className="text-accent">{searchQuery}</Text>
               </Text>
             )}
-          </>
+          </View>
         }
+        stickyHeaderIndices={[0]}
         ListEmptyComponent={
           !loading && !error ? (
             <View className="mt-10 pxx-5">
