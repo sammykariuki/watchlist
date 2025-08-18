@@ -7,6 +7,11 @@ export default function TrendingCard({
   movie: { movie_id, title, poster_url },
   index,
 }: TrendingCardProps) {
+  const number = index + 1;
+  const isDoubleDigit = number >= 10;
+  const imageClass = isDoubleDigit ? "w-20 h-14" : "size-14";
+  const textClass = isDoubleDigit ? "text-5xl" : "text-6xl";
+
   return (
     <Link href={`/movie/${movie_id}`} asChild>
       <TouchableOpacity className="w-32 relative pl-5">
@@ -18,12 +23,14 @@ export default function TrendingCard({
         <View className="absolute bottom-9 -left-3.5 px-2 py-1 rounded-full">
           <MaskedView
             maskElement={
-              <Text className="font-bold text-white text-6xl">{index + 1}</Text>
+              <Text className={`font-bold text-white ${textClass}`}>
+                {number}
+              </Text>
             }
           >
             <Image
               source={images.rankingGradient}
-              className="size-14"
+              className={imageClass}
               resizeMode="cover"
             />
           </MaskedView>

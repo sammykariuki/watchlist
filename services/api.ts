@@ -9,19 +9,25 @@ export const TMDB_CONFIG = {
   },
 };
 
-export const fetchMovies = async ({ query }: { query: string }) => {
+export const fetchMovies = async ({
+  query,
+  page = 1,
+}: {
+  query: string;
+  page?: number;
+}) => {
   try {
     const endpoint = query
       ? `${TMDB_CONFIG.BASE_URL}/search/movie?query=${encodeURIComponent(
           query
-        )}`
-      : `${TMDB_CONFIG.BASE_URL}/discover/movie?sort_by=popularity.desc`;
+        )}&page=${page}`
+      : `${TMDB_CONFIG.BASE_URL}/discover/movie?sort_by=popularity.desc&page=${page}`;
 
     const response = await axios.get(endpoint, {
       headers: TMDB_CONFIG.headers,
     });
 
-    return response.data.results;
+    return response.data; // 👈 return full TMDB response, not just results
   } catch (error) {
     console.error("Error fetching movies:", error);
     throw new Error("Failed to fetch movies");

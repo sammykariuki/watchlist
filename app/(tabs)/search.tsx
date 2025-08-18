@@ -6,7 +6,14 @@ import { fetchMovies } from "@/services/api";
 import { updateSearchCount } from "@/services/appwrite";
 import useFetch from "@/services/useFetch";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Image, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function Search() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,8 +37,8 @@ export default function Search() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
   useEffect(() => {
-    if (movies?.length > 0 && movies?.[0]) {
-      updateSearchCount(searchQuery, movies[0]);
+    if (movies?.results?.length > 0 && movies.results[0]) {
+      updateSearchCount(searchQuery, movies.results[0]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [movies]);
@@ -39,7 +46,7 @@ export default function Search() {
     <View className="flex-1 bg-primary">
       <Image source={images.bg} className="flex-1 absolute w-full z-0" />
       <FlatList
-        data={movies}
+        data={movies?.results ?? []}
         renderItem={({ item }) => <MovieCard {...item} />}
         keyExtractor={(item) => item.id.toString()}
         className="px-5"
@@ -73,9 +80,15 @@ export default function Search() {
               />
             )}
             {error && (
-              <Text className="text-red-500 px-5 my-3">
-                Error: {error.message}
-              </Text>
+              <View className="flex-row justify-center items-center gap-4 px-5 my-3">
+                <Text className="text-red-500">Error: {error.message}</Text>
+                <TouchableOpacity
+                  onPress={loadMovies}
+                  className="bg-gray-700 px-4 py-2 rounded"
+                >
+                  <Text className="text-white">Retry</Text>
+                </TouchableOpacity>
+              </View>
             )}
             {!loading && !error && searchQuery.trim() && movies?.length > 0 && (
               <Text className="text-xl text-white font-bold">
@@ -88,7 +101,7 @@ export default function Search() {
         stickyHeaderIndices={[0]}
         ListEmptyComponent={
           !loading && !error ? (
-            <View className="mt-10 pxx-5">
+            <View className="mt-10 px-5">
               <Text className="text-center text-gray-500">
                 {searchQuery.trim() ? "No movies found" : "Search for a Movie"}
               </Text>
