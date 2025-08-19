@@ -6,6 +6,7 @@ import {
   removeSavedMovie,
   saveMovie,
 } from "@/services/appwrite";
+import { emitter } from "@/services/events";
 import useFetch from "@/services/useFetch";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -73,6 +74,7 @@ export default function MovieDetails() {
       if (isSaved) {
         await removeSavedMovie(id as string);
         setIsSaved(false);
+        emitter.emit("refetchSavedMovies");
       } else {
         await saveMovie({
           movie_id: String(movie.id),
@@ -82,6 +84,7 @@ export default function MovieDetails() {
           release_date: movie.release_date,
         });
         setIsSaved(true);
+        emitter.emit("refetchSavedMovies");
       }
     } catch (error: any) {
       console.error("Error toggling save:", error.message);

@@ -3,13 +3,15 @@ import SearchBar from "@/components/SearchBar";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { getCurrentUser, getSavedMovies } from "@/services/appwrite";
+import { emitter } from "@/services/events";
 import useFetch from "@/services/useFetch";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Image,
+  RefreshControl,
   Text,
   TouchableOpacity,
   View,
@@ -19,6 +21,7 @@ export default function Saved() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
   const {
     data: savedMovies,
     loading: savedLoading,
@@ -31,6 +34,24 @@ export default function Saved() {
     savedMovies?.filter((movie) =>
       movie.title.toLowerCase().includes(searchQuery.toLowerCase())
     ) || [];
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadSaved();
+    setRefreshing(false);
+  }, [loadSaved]);
+
+  useEffect(() => {
+    const handler = () => {
+      if (user) {
+        loadSaved();
+      }
+    };
+    emitter.on("refetchSavedMovies", handler);
+    return () => {
+      emitter.off("refetchSavedMovies", handler);
+    };
+  }, [user, loadSaved]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -96,6 +117,9 @@ export default function Saved() {
         contentContainerStyle={{
           paddingBottom: 100,
         }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         ListHeaderComponent={
           <View>
             <View className="w-full flex-row justify-center mt-20 items-center">
