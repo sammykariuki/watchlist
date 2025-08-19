@@ -44,7 +44,7 @@ export default function Search() {
   }, [movies]);
   return (
     <View className="flex-1 bg-primary">
-      <Image source={images.bg} className="flex-1 absolute w-full z-0" />
+      <Image source={images.bg} className="flex-1 absolute w-full z-0 h-full" />
       <FlatList
         data={movies?.results ?? []}
         renderItem={({ item }) => <MovieCard {...item} />}

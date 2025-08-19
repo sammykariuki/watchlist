@@ -8,7 +8,7 @@ export default function MovieCard({
   title,
   vote_average,
   release_date,
-}: Movie) {
+}: MovieCardProps) {
   return (
     <Link href={`/movie/${id}`} asChild>
       <TouchableOpacity className="w-[30%]">
