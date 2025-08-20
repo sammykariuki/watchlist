@@ -60,10 +60,21 @@ export async function updateUsername(newName: string) {
 
 export async function createPasswordRecovery(email: string) {
   try {
-    // Replace with your recovery URL (e.g., deep link for mobile)
-    await account.createRecovery(email, "https://yourapp.com/recover");
+    await account.createRecovery(email, "watchlistapp://recover");
   } catch (error: any) {
     throw new Error(error.message || "Failed to send recovery email");
+  }
+}
+
+export async function completePasswordRecovery(
+  userId: string,
+  secret: string,
+  newPassword: string
+) {
+  try {
+    await account.updateRecovery(userId, secret, newPassword);
+  } catch (error: any) {
+    throw new Error(error.message || "Failed to reset password");
   }
 }
 
